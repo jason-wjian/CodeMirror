@@ -54,7 +54,12 @@
       if (!context) var context = [];
       context.push(tprop);
     }
-    return {list: getCompletions(token, context, keywords, options),
+
+    var uValues = this.uValues;//获取上次的内容
+    this.uValues = editor.getValue();//更新上次内容
+    var isUpdate = uValues==this.uValues;//比较内容是否和上次的一样
+
+    return {list: getCompletions(token, context, isUpdate, keywords, options),
             from: Pos(cur.line, token.start),
             to: Pos(cur.line, token.end)};
   }
@@ -108,7 +113,16 @@
     }
   }
 
-  function getCompletions(token, context, keywords, options) {
+  function getCompletions(token, context, isUpdate, keywords, options) {
+    //这里是优化 点击，选中和改动 都会触发提示，而且关键词删除不了等问题
+    var start = this.start;
+    var end = this.end;
+    this.start = token.start;
+    this.end = token.end;
+    if (token.type == null || (start == this.start  && !((end - this.end) == -1))||isUpdate) {
+      return {list: {}};
+    }
+
     var found = [], start = token.string, global = options && options.globalScope || window;
     function maybeAdd(str) {
       if (str.lastIndexOf(start, 0) == 0 && !arrayContains(found, str)) found.push(str);
