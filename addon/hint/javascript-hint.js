@@ -57,7 +57,7 @@
 
     var uValues = this.uValues;//获取上次的内容
     this.uValues = editor.getValue();//更新上次内容
-    var isUpdate = uValues==this.uValues;//比较内容是否和上次的一样
+    var isUpdate = uValues!==this.uValues;//比较内容是否和上次的一样，不一样为true
 
     return {list: getCompletions(token, context, isUpdate, keywords, options),
             from: Pos(cur.line, token.start),
@@ -119,7 +119,7 @@
     var end = this.end;
     this.start = token.start;
     this.end = token.end;
-    if (token.type == null || (start == this.start  && !((end - this.end) == -1))||isUpdate) {
+    if (token.type == null || (start == this.start  && !((end - this.end) == -1))||!isUpdate) {
       return {list: {}};
     }
 
